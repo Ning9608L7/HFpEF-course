@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HFpEF 互動學習課程</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #0ABAB5;
+            --accent-light-green: #75E6DA;
+            --accent-dark-green: #07827F;
+            --text-dark: #334155;
+            --light-bg: #F8F9FA;
+            --medium-gray: #eef1f3;
+            --white: #ffffff;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans TC', sans-serif;
+            margin: 0;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+            font-size: 19px;
+        }
+
+        .course-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(42, 157, 143, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-light-green));
+            color: var(--white);
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.1em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+        }
+        
+        #progress-bar-container {
+            width: 100%;
+            background-color: var(--medium-gray);
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 10px;
+            background-color: var(--primary-green);
+            transition: width 0.5s ease;
+        }
+
+        main {
+            padding: 40px 50px;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section.active {
+            display: block;
+        }
+        
+        .intro-page h2 {
+            color: var(--primary-green);
+            text-align: center;
+            font-size: 1.8em;
+        }
+        .intro-page p {
+            font-size: 1.2em;
+            line-height: 1.8;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .intro-page .credit-info {
+            font-weight: 500;
+            color: var(--accent-dark-green);
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-green);
+        }
+
+        h2, h3, h4, h5 {
+            color: var(--primary-green);
+            border-bottom: 2px solid var(--medium-gray);
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .sub-heading {
+            color: var(--text-dark);
+            border-bottom: none;
+            font-size: 1.25rem; /* 20px */
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p, li {
+            line-height: 2.0;
+        }
+
+        .highlight {
+            font-weight: 700;
+            font-size: 1.05em;
+            color: var(--primary-green);
+        }
+
+        /* --- 測驗樣式 --- */
+        .quiz-page p.question {
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-top: 0;
+            color: var(--primary-green);
+        }
+
+        .quiz-page .options label {
+            display: block;
+            margin: 12px 0;
+            padding: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-page .options label:hover {
+            border-color: var(--primary-green);
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .quiz-page .options.answered label {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .quiz-page .options.answered label:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .quiz-page .options label.correct {
+            border-color: var(--correct-color);
+            background-color: #eafaf1;
+            font-weight: 700;
+        }
+        .quiz-page .options label.incorrect {
+            border-color: var(--incorrect-color);
+            background-color: #fbe9e7;
+        }
+
+        .explanation {
+            display: none;
+            padding: 18px;
+            margin-top: 25px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 5px solid var(--accent-light-green);
+            line-height: 1.8;
+        }
+        .explanation b {
+            color: var(--primary-green);
+        }
+
+        /* --- 導覽按鈕 --- */
+        .page-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+        
+        .nav-btn {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:hover {
+            background-color: var(--accent-dark-green);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+        }
+        .nav-btn.prev-btn {
+            background-color: #6c757d;
+        }
+        .nav-btn.prev-btn:hover {
+            background-color: #5a6268;
+        }
+        .nav-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .intro-page .page-nav, .final-page .page-nav {
+            justify-content: center;
+            gap: 20px;
+        }
+        .quiz-page .next-btn {
+            display: none;
+        }
+
+        .export-btn {
+            background-color: var(--primary-green);
+            animation: pulse 2s infinite;
+        }
+        .export-btn:hover {
+            background-color: var(--accent-dark-green);
+            animation-play-state: paused;
+        }
+        .button-icon {
+            margin-left: 12px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 1.5em;
+            line-height: 1;
+            text-shadow: none;
+        }
+        .export-btn:hover .button-icon {
+            transform: translateX(8px) rotate(15deg);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(42, 157, 143, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(42, 157, 143, 0.3); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(42, 157, 143, 0.2); }
+        }
+
+
+        /* --- 結果頁面樣式 --- */
+        #quiz-results {
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+        .chart-container svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        .chart-background {
+            fill: none;
+            stroke: var(--medium-gray);
+            stroke-width: 25;
+        }
+        .chart-foreground {
+            fill: none;
+            stroke: var(--primary-green);
+            stroke-width: 25;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        .chart-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        #result-message {
+            font-size: 1.2em;
+            line-height: 1.7;
+        }
+        #submission-status {
+            margin-top: 15px;
+            font-style: italic;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* --- 頁尾樣式 --- */
+        .page-footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+            text-align: center;
+            font-size: 0.9em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="course-container">
+        <header>
+            <h1>HFpEF 互動學習課程</h1>
+        </header>
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <main>
+            <!-- Page 0: 課程簡介 -->
+            <section id="page-0" class="content-section active intro-page">
+                <h2>歡迎使用「HFpEF互動學習課程」</h2>
+                <p>本課程以互動式方式，引導您深入認識左心室正常收縮分率心臟衰竭（HFpEF）的整合照護，提升臨床應用能力與照護品質。</p>
+                <p class="credit-info">完成課程後，您將獲得院內心衰竭疾病照護品質教育訓練 1 學分。</p>
+                <div class="page-nav">
+                    <button class="nav-btn start-btn">開始課程</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+
+            <!-- Page 1: 第一章 -->
+            <section id="page-1" class="content-section">
+                <h2>第一章：疾病面向</h2>
+                <h5 class="sub-heading">定義與特徵</h5>
+                <p>心臟衰竭（HF）是一種複雜的臨床症候群。根據左心室射血分數（LVEF），可分為：</p>
+                <ul>
+                    <li><b>HFpEF（左心室正常收縮分率心臟衰竭）</b>: <span class="highlight">LVEF ≥ 50%</span></li>
+                    <li><b>HFmrEF（左心室輕度降低收縮分率心臟衰竭）</b>: LVEF 41-49%</li>
+                    <li><b>HFrEF（左心室低收縮分率心臟衰竭）</b>: LVEF ≤ 40%</li>
+                </ul>
+                <p>HFpEF的主要特徵是<span class="highlight">左心室舒張功能不良</span>，心臟在舒張期無法有效填充血液。</p>
+                <div class="page-nav">
+                    <button class="nav-btn prev-btn">回首頁</button>
+                    <button class="nav-btn next-btn">下一章</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+            
+            <!-- Page 2: 第二章 -->
+            <section id="page-2" class="content-section">
+                <h2>第二章：飲食面向</h2>
+                <h5 class="sub-heading">飲食管理建議</h5>
+                <ul>
+                    <li><b>控制鈉攝取</b>：減少鹽分有助於控制血壓和減少體液滯留。</li>
+                    <li><b>均衡營養</b>：強調攝取<span class="highlight">新鮮水果和蔬菜</span>、全穀物的「得舒飲食(DASH diet)」原則，其主要特點為<span class="highlight">高纖維和低鈉攝取</span>。</li>
+                    <li><b>體重管理</b>：對於肥胖患者，減重是重要的非藥物治療策略。</li>
+                </ul>
+                <div class="page-nav">
+                    <button class="nav-btn prev-btn">上一章</button>
+                    <button class="nav-btn next-btn">下一章</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+            
+            <!-- Page 3: 第三章 -->
+            <section id="page-3" class="content-section">
+                <h2>第三章：生活照護管理</h2>
+                <p>HFpEF的治療目標是減輕症狀、改善功能狀態並降低住院風險。</p>
+                <ul>
+                    <li><b>症狀緩解</b>：主要護理目標是<span class="highlight">減少液體滯留和改善呼吸困難</span>。</li>
+                    <li><b>共病症管理</b>：積極控制<span class="highlight">高血壓、糖尿病、肥胖</span>等共病症。</li>
+                    <li><b>生活方式調整</b>：HFpEF的管理需要<span class="highlight">結合藥物治療和生活方式改變</span>，這是治療的基石。</li>
+                </ul>
+                <div class="page-nav">
+                    <button class="nav-btn prev-btn">上一章</button>
+                    <button class="nav-btn next-btn">下一章</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+
+            <!-- Page 4: 第四章 -->
+            <section id="page-4" class="content-section">
+                <h2>第四章：藥物面向</h2>
+                <p>近年來，<b>SGLT2抑制劑</b>已成為HFpEF治療的基礎藥物。其主要作用機制是<span class="highlight">減少腎臟葡萄糖重吸收</span>，產生利尿效果，進而<span class="highlight">減少心臟負荷和改善心臟功能</span>。</p>
+                <div class="page-nav">
+                    <button class="nav-btn prev-btn">上一章</button>
+                    <button class="nav-btn next-btn">下一章</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+
+            <!-- Page 5: 第五章 -->
+            <section id="page-5" class="content-section">
+                <h2>第五章：復健面向</h2>
+                <p>運動訓練是HFpEF非藥物治療的重要一環。指引建議患者應進行<b>有監督的運動訓練</b>。</p>
+                <ul>
+                    <li><b>運動類型</b>：復健計畫通常包括<span class="highlight">中等強度的有氧運動</span>，並<span class="highlight">結合有氧運動和力量訓練</span>。</li>
+                    <li><b>效果</b>：改善運動耐力、提升生活品質。</li>
+                    <li><b>注意事項</b>：運動計畫應個人化並在專業人員監督下進行。</li>
+                </ul>
+                <div class="page-nav">
+                    <button class="nav-btn prev-btn">上一章</button>
+                    <button class="nav-btn next-btn">開始測驗</button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+
+            <!-- Pages 6-15: 綜合測驗 (動態生成) -->
+            
+            <!-- Page 16: 最終結果 -->
+            <section id="page-16" class="content-section final-page">
+                <h2>測驗完成！</h2>
+                <div id="quiz-results">
+                    <div class="chart-container">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="chart-background" cx="50" cy="50" r="40"></circle>
+                            <circle class="chart-foreground" id="score-circle" cx="50" cy="50" r="40"></circle>
+                        </svg>
+                        <div class="chart-text" id="score-text"></div>
+                    </div>
+                    <div id="result-message"></div>
+                    <div id="submission-status"></div>
+                </div>
+                <div class="page-nav">
+                    <button class="nav-btn restart-btn">重新開始課程</button>
+                    <button class="nav-btn export-btn">按我拿學分<span class="button-icon">&#128073;</span></button>
+                </div>
+                <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContent = document.querySelector('main');
+            const progressBar = document.getElementById('progress-bar');
+            let currentPageIndex = 0;
+            let score = 0;
+            let userAnswers = new Array(10).fill(null); // 用來儲存每題的答案
+
+            const allQuestions = [
+                { q: "1. HFpEF的主要特徵是：", o: ["A) 左心室收縮功能不良", "B) 左心室舒張功能不良", "C) 右心室收縮功能不良", "D) 右心室舒張功能不良"], a: "B", exp: "HFpEF（Heart Failure with Preserved Ejection Fraction）主要特徵是左心室舒張功能不良，這意味著心臟在舒張期無法有效填充，儘管射血分數（EF）正常。" },
+                { q: "2. HFpEF患者的左心室射血分數（LVEF）通常是：", o: ["A) <40%", "B) 40-49%", "C) ≥50%", "D) 不確定"], a: "C", exp: "HFpEF的定義之一是左心室射血分數（LVEF）通常在50%或以上，這表示心臟的收縮功能是保留的。" },
+                { q: "3. 在HFpEF患者的飲食管理中，得舒飲食（DASH diet）主要強調：", o: ["A) 高脂肪攝入", "B) 高鹽攝入", "C) 高纖維和低鈉攝取", "D) 高蛋白攝入"], a: "C", exp: "得舒飲食旨在降低血壓，強調攝入高纖維和低鈉食物，以改善心血管健康。" },
+                { q: "4. HFpEF患者的飲食管理中，得舒飲食建議增加以下哪一類食物的攝入？", o: ["A) 加工食品", "B) 新鮮水果和蔬菜", "C) 高糖飲料", "D) 紅肉"], a: "B", exp: "得舒飲食提倡增加新鮮水果和蔬菜的攝入，因為它們富含纖維和有益心臟健康的營養素。" },
+                { q: "5. HFpEF患者的主要護理目標之一是：", o: ["A) 增加心臟負荷", "B) 減少液體滯留和改善呼吸困難", "C) 增加體重", "D) 增加鈉攝入"], a: "B", exp: "主要護理目標是減少液體滯留，這有助於減輕心臟負擔並改善呼吸困難等症狀。" },
+                { q: "6. 在HFpEF的管理中，以下哪一項是正確的？", o: ["A) 僅依賴藥物治療", "B) 僅依賴生活方式改變", "C) 結合藥物治療和生活方式改變", "D) 僅依賴手術治療"], a: "C", exp: "HFpEF的管理通常需要結合藥物治療和生活方式改變，以達到最佳的治療效果。" },
+                { q: "7. SGLT2抑制劑（SGLT2i）在HFpEF患者中的作用主要是：", o: ["A) 增加心臟收縮力", "B) 減少心臟負荷和改善心臟功能", "C) 增加血糖水平", "D) 增加體重"], a: "B", exp: "SGLT2抑制劑有助於減少液體滯留，從而減少心臟負荷並改善心臟功能。" },
+                { q: "8. 在HFpEF的藥物治療中，SGLT2抑制劑的主要作用機制是：", o: ["A) 增加腎臟葡萄糖重吸收", "B) 減少腎臟葡萄糖重吸收", "C) 增加腎臟鈉重吸收", "D) 減少腎臟鈉重吸收"], a: "B", exp: "SGLT2抑制劑通過減少腎臟對葡萄糖的重吸收，從而降低血糖水平，並具有利尿作用。" },
+                { q: "9. HFpEF患者的復健計畫通常包括：", o: ["A) 高強度間歇訓練", "B) 中等強度的有氧運動", "C) 僅限於靜態運動", "D) 無需運動"], a: "B", exp: "中等強度的有氧運動有助於改善心臟功能和整體健康，適合HFpEF患者。" },
+                { q: "10. 在HFpEF患者的復健計畫中，哪一項是正確的？", o: ["A) 完全避免運動", "B) 僅進行力量訓練", "C) 結合有氧運動和力量訓練", "D) 僅進行靜態運動"], a: "C", exp: "結合有氧運動和力量訓練有助於改善心臟健康和整體體能，對HFpEF患者有益。" }
+            ];
+            
+            function createQuizPages() {
+                allQuestions.forEach((q, index) => {
+                    const pageIndex = 6 + index;
+                    const quizPage = document.createElement('section');
+                    quizPage.id = `page-${pageIndex}`;
+                    quizPage.className = 'content-section quiz-page';
+
+                    let optionsHtml = '';
+                    q.o.forEach(optionText => {
+                        const value = optionText.charAt(0);
+                        optionsHtml += `<label><input type="radio" name="q${index}" value="${value}"> ${optionText}</label>`;
+                    });
+
+                    quizPage.innerHTML = `
+                        <h2>綜合測驗 - 第 ${index + 1} 題</h2>
+                        <p class="question">${q.q}</p>
+                        <div class="options" id="options-${index}">${optionsHtml}</div>
+                        <div class="explanation" id="exp-${index}"><b>解說：</b>${q.exp}</div>
+                        <div class="page-nav">
+                            <button class="nav-btn prev-btn">上一題</button>
+                            <button class="nav-btn next-btn">${(index === allQuestions.length - 1) ? '查看結果並自動儲存' : '下一題'}</button>
+                        </div>
+                        <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+                    `;
+                    mainContent.insertBefore(quizPage, document.getElementById('page-16'));
+                });
+            }
+
+            function handleQuizAnswer(qIndex) {
+                const qData = allQuestions[qIndex];
+                const optionsContainer = document.getElementById(`options-${qIndex}`);
+                const labels = optionsContainer.querySelectorAll('label');
+                const explanation = document.getElementById(`exp-${qIndex}`);
+                const nextBtn = document.querySelector(`#page-${6 + qIndex} .next-btn`);
+
+                labels.forEach(label => {
+                    const radio = label.querySelector('input');
+                    radio.addEventListener('click', () => {
+                        if (optionsContainer.classList.contains('answered')) return;
+                        
+                        optionsContainer.classList.add('answered');
+                        userAnswers[qIndex] = radio.value; // 儲存使用者答案
+                        
+                        if (radio.value === qData.a) {
+                            label.classList.add('correct');
+                            score++;
+                        } else {
+                            label.classList.add('incorrect');
+                            labels.forEach(l => {
+                                if (l.querySelector('input').value === qData.a) {
+                                    l.classList.add('correct');
+                                }
+                            });
+                        }
+                        explanation.style.display = 'block';
+                        nextBtn.style.display = 'inline-block';
+                    });
+                });
+            }
+
+            function showPage(index) {
+                document.querySelectorAll('.content-section').forEach(p => p.classList.remove('active'));
+                const targetPage = document.getElementById(`page-${index}`);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                    currentPageIndex = index;
+                    const totalPages = 5 + allQuestions.length + 1;
+                    const progress = (currentPageIndex / totalPages) * 100;
+                    progressBar.style.width = `${progress}%`;
+                }
+            }
+
+            function setupNavButtons() {
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const parentPage = btn.closest('.content-section');
+                        const pageIdNum = parseInt(parentPage.id.split('-')[1]);
+
+                        if (btn.classList.contains('start-btn')) {
+                            showPage(1);
+                        } else if (btn.classList.contains('next-btn')) {
+                            showPage(pageIdNum + 1);
+                        } else if (btn.classList.contains('prev-btn')) {
+                            showPage(pageIdNum - 1);
+                        } else if (btn.classList.contains('restart-btn')) {
+                            location.reload();
+                        } else if (btn.classList.contains('export-btn')) {
+                            openPrefilledGoogleForm();
+                        }
+                    });
+                });
+            }
+            
+            function showFinalResults() {
+                const scoreCircle = document.getElementById('score-circle');
+                const scoreText = document.getElementById('score-text');
+                const resultMessageEl = document.getElementById('result-message');
+                const radius = scoreCircle.r.baseVal.value;
+                const circumference = 2 * Math.PI * radius;
+                const percentage = score / allQuestions.length;
+                const offset = circumference * (1 - percentage);
+
+                scoreCircle.style.strokeDasharray = circumference;
+                scoreCircle.style.strokeDashoffset = circumference;
+                setTimeout(() => {
+                    scoreCircle.style.strokeDashoffset = offset;
+                }, 100);
+
+                scoreText.textContent = `${score}/${allQuestions.length}`;
+                
+                let resultMessage = '';
+                if (percentage === 1) {
+                    resultMessage = '<h3>恭喜您！</h3><p>全部答對，您已完全掌握HFpEF的核心知識。</p>';
+                } else if (percentage >= 0.8) {
+                    resultMessage = '<h3>表現優異！</h3><p>您對HFpEF有非常好的理解。</p>';
+                } else if (percentage >= 0.6) {
+                    resultMessage = '<h3>不錯的成績！</h3><p>建議您可以回顧答錯的題目以加深印象。</p>';
+                } else {
+                    resultMessage = '<h3>再接再厲！</h3><p>建議您重新學習課程內容，鞏固知識基礎。</p>';
+                }
+                resultMessageEl.innerHTML = resultMessage;
+
+                // 自動在背景提交結果
+                submitToGoogleFormInBackground();
+            }
+
+            function submitToGoogleFormInBackground() {
+                const statusEl = document.getElementById('submission-status');
+                statusEl.textContent = '正在儲存您的作答紀錄...';
+
+                const webAppUrl = "https://script.google.com/macros/s/AKfycbxA5sw7C_aIG8pulWBG-iukEWOtlz4zns200HP3op7nb0YMEJETYWCq8SG1pf_SNeUv/exec"; 
+
+                const payload = {
+                    answers: userAnswers,
+                    score: score
+                };
+
+                fetch(webAppUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        statusEl.textContent = '您的作答紀錄已成功儲存！';
+                        statusEl.style.color = 'var(--correct-color)';
+                    } else {
+                        throw new Error(data.message);
+                    }
+                }).catch(error => {
+                    console.error('提交錯誤:', error);
+                    statusEl.textContent = '';
+                });
+            }
+
+            function openPrefilledGoogleForm() {
+                const googleFormViewUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc8QsDdvTsxQsj9ysG-qRi7GwyBSd19kdpVnABwwnQclnouJQ/viewform";
+
+                const entryIds = [
+                    "entry.111604194", "entry.148114285", "entry.158789589", "entry.1292023933", 
+                    "entry.198279951", "entry.103983281", "entry.117196010", "entry.1593035392", 
+                    "entry.1691283594", "entry.2120032997"
+                ];
+                
+                const scoreEntryId = "entry.151787163"; 
+
+                let prefilledUrl = `${googleFormViewUrl}?usp=pp_url`;
+
+                userAnswers.forEach((answer, index) => {
+                    if(answer) {
+                        prefilledUrl += `&${entryIds[index]}=${encodeURIComponent(answer)}`;
+                    }
+                });
+
+                prefilledUrl += `&${scoreEntryId}=${encodeURIComponent(score)}`;
+
+                window.open(prefilledUrl, '_blank');
+            }
+
+            // --- 初始化流程 ---
+            createQuizPages();
+            allQuestions.forEach((_, index) => handleQuizAnswer(index));
+            setupNavButtons();
+            document.querySelector('#page-15 .next-btn').addEventListener('click', showFinalResults);
+            showPage(0);
+        });
+    </script>
+</body>
+</html>
