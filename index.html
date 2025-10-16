@@ -108,6 +108,13 @@
             border-left: 5px solid var(--primary-green);
         }
 
+        .intro-page .completion-count {
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--accent-dark-green);
+        }
+
         h2, h3, h4, h5 {
             color: var(--primary-green);
             border-bottom: 2px solid var(--medium-gray);
@@ -333,6 +340,7 @@
                 <h2>歡迎使用「HFpEF互動學習課程」</h2>
                 <p>本課程以互動式方式，引導您深入認識左心室正常收縮分率心臟衰竭（HFpEF）的整合照護，提升臨床應用能力與照護品質。</p>
                 <p class="credit-info">完成課程後，您將獲得院內心衰竭疾病照護品質教育訓練 1 學分。</p>
+                <p class="completion-count">目前已有 <span id="completion-number">0</span> 人完成此課程</p>
                 <div class="page-nav">
                     <button class="nav-btn start-btn">開始課程</button>
                 </div>
@@ -448,6 +456,7 @@
             let currentPageIndex = 0;
             let score = 0;
             let userAnswers = new Array(10).fill(null); // 用來儲存每題的答案
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbxA5sw7C_aIG8pulWBG-iukEWOtlz4zns200HP3op7nb0YMEJETYWCq8SG1pf_SNeUv/exec";
 
             const allQuestions = [
                 { q: "1. HFpEF的主要特徵是：", o: ["A) 左心室收縮功能不良", "B) 左心室舒張功能不良", "C) 右心室收縮功能不良", "D) 右心室舒張功能不良"], a: "B", exp: "HFpEF（Heart Failure with Preserved Ejection Fraction）主要特徵是左心室舒張功能不良，這意味著心臟在舒張期無法有效填充，儘管射血分數（EF）正常。" },
@@ -554,7 +563,20 @@
                     });
                 });
             }
-            
+
+            function fetchCompletionCount() {
+                const countEl = document.getElementById('completion-number');
+                if (!countEl) return;
+                fetch(webAppUrl)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.count !== undefined) {
+                            countEl.textContent = data.count;
+                        }
+                    })
+                    .catch(err => console.error('取得完成課程人數失敗:', err));
+            }
+
             function showFinalResults() {
                 const scoreCircle = document.getElementById('score-circle');
                 const scoreText = document.getElementById('score-text');
@@ -591,8 +613,6 @@
             function submitToGoogleFormInBackground() {
                 const statusEl = document.getElementById('submission-status');
                 statusEl.textContent = '正在儲存您的作答紀錄...';
-
-                const webAppUrl = "https://script.google.com/macros/s/AKfycbxA5sw7C_aIG8pulWBG-iukEWOtlz4zns200HP3op7nb0YMEJETYWCq8SG1pf_SNeUv/exec"; 
 
                 const payload = {
                     answers: userAnswers,
@@ -648,6 +668,7 @@
             allQuestions.forEach((_, index) => handleQuizAnswer(index));
             setupNavButtons();
             document.querySelector('#page-15 .next-btn').addEventListener('click', showFinalResults);
+            fetchCompletionCount();
             showPage(0);
         });
     </script>
