@@ -450,227 +450,268 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mainContent = document.querySelector('main');
-            const progressBar = document.getElementById('progress-bar');
-            let currentPageIndex = 0;
-            let score = 0;
-            let userAnswers = new Array(10).fill(null); // 用來儲存每題的答案
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbxA5sw7C_aIG8pulWBG-iukEWOtlz4zns200HP3op7nb0YMEJETYWCq8SG1pf_SNeUv/exec";
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.querySelector('main');
+        const progressBar = document.getElementById('progress-bar');
 
-            const allQuestions = [
-                { q: "1. HFpEF的主要特徵是：", o: ["A) 左心室收縮功能不良", "B) 左心室舒張功能不良", "C) 右心室收縮功能不良", "D) 右心室舒張功能不良"], a: "B", exp: "HFpEF（Heart Failure with Preserved Ejection Fraction）主要特徵是左心室舒張功能不良，這意味著心臟在舒張期無法有效填充，儘管射血分數（EF）正常。" },
-                { q: "2. HFpEF患者的左心室射血分數（LVEF）通常是：", o: ["A) <40%", "B) 40-49%", "C) ≥50%", "D) 不確定"], a: "C", exp: "HFpEF的定義之一是左心室射血分數（LVEF）通常在50%或以上，這表示心臟的收縮功能是保留的。" },
-                { q: "3. 在HFpEF患者的飲食管理中，得舒飲食（DASH diet）主要強調：", o: ["A) 高脂肪攝入", "B) 高鹽攝入", "C) 高纖維和低鈉攝取", "D) 高蛋白攝入"], a: "C", exp: "得舒飲食旨在降低血壓，強調攝入高纖維和低鈉食物，以改善心血管健康。" },
-                { q: "4. HFpEF患者的飲食管理中，得舒飲食建議增加以下哪一類食物的攝入？", o: ["A) 加工食品", "B) 新鮮水果和蔬菜", "C) 高糖飲料", "D) 紅肉"], a: "B", exp: "得舒飲食提倡增加新鮮水果和蔬菜的攝入，因為它們富含纖維和有益心臟健康的營養素。" },
-                { q: "5. HFpEF患者的主要護理目標之一是：", o: ["A) 增加心臟負荷", "B) 減少液體滯留和改善呼吸困難", "C) 增加體重", "D) 增加鈉攝入"], a: "B", exp: "主要護理目標是減少液體滯留，這有助於減輕心臟負擔並改善呼吸困難等症狀。" },
-                { q: "6. 在HFpEF的管理中，以下哪一項是正確的？", o: ["A) 僅依賴藥物治療", "B) 僅依賴生活方式改變", "C) 結合藥物治療和生活方式改變", "D) 僅依賴手術治療"], a: "C", exp: "HFpEF的管理通常需要結合藥物治療和生活方式改變，以達到最佳的治療效果。" },
-                { q: "7. SGLT2抑制劑（SGLT2i）在HFpEF患者中的作用主要是：", o: ["A) 增加心臟收縮力", "B) 減少心臟負荷和改善心臟功能", "C) 增加血糖水平", "D) 增加體重"], a: "B", exp: "SGLT2抑制劑有助於減少液體滯留，從而減少心臟負荷並改善心臟功能。" },
-                { q: "8. 在HFpEF的藥物治療中，SGLT2抑制劑的主要作用機制是：", o: ["A) 增加腎臟葡萄糖重吸收", "B) 減少腎臟葡萄糖重吸收", "C) 增加腎臟鈉重吸收", "D) 減少腎臟鈉重吸收"], a: "B", exp: "SGLT2抑制劑通過減少腎臟對葡萄糖的重吸收，從而降低血糖水平，並具有利尿作用。" },
-                { q: "9. HFpEF患者的復健計畫通常包括：", o: ["A) 高強度間歇訓練", "B) 中等強度的有氧運動", "C) 僅限於靜態運動", "D) 無需運動"], a: "B", exp: "中等強度的有氧運動有助於改善心臟功能和整體健康，適合HFpEF患者。" },
-                { q: "10. 在HFpEF患者的復健計畫中，哪一項是正確的？", o: ["A) 完全避免運動", "B) 僅進行力量訓練", "C) 結合有氧運動和力量訓練", "D) 僅進行靜態運動"], a: "C", exp: "結合有氧運動和力量訓練有助於改善心臟健康和整體體能，對HFpEF患者有益。" }
-            ];
-            
-            function createQuizPages() {
-                allQuestions.forEach((q, index) => {
-                    const pageIndex = 6 + index;
-                    const quizPage = document.createElement('section');
-                    quizPage.id = `page-${pageIndex}`;
-                    quizPage.className = 'content-section quiz-page';
+        let currentPageIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(10).fill(null);
+        let hasSubmittedCompletion = false;
 
-                    let optionsHtml = '';
-                    q.o.forEach(optionText => {
-                        const value = optionText.charAt(0);
-                        optionsHtml += `<label><input type="radio" name="q${index}" value="${value}"> ${optionText}</label>`;
-                    });
+        // 請把這裡換成你的 Google Apps Script Web App URL
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbypq0p0zsAivxbRsRbYhDKRNzMW1TqIHv5ZaECwvw5Hcl6pewsOuUsVr2-HE1qaHDYnpg/exec";
 
-                    quizPage.innerHTML = `
-                        <h2>綜合測驗 - 第 ${index + 1} 題</h2>
-                        <p class="question">${q.q}</p>
-                        <div class="options" id="options-${index}">${optionsHtml}</div>
-                        <div class="explanation" id="exp-${index}"><b>解說：</b>${q.exp}</div>
-                        <div class="page-nav">
-                            <button class="nav-btn prev-btn">上一題</button>
-                            <button class="nav-btn next-btn">${(index === allQuestions.length - 1) ? '查看結果並自動儲存' : '下一題'}</button>
-                        </div>
-                        <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
-                    `;
-                    mainContent.insertBefore(quizPage, document.getElementById('page-16'));
+        const allQuestions = [
+            { q: "1. HFpEF的主要特徵是：", o: ["A) 左心室收縮功能不良", "B) 左心室舒張功能不良", "C) 右心室收縮功能不良", "D) 右心室舒張功能不良"], a: "B", exp: "HFpEF（Heart Failure with Preserved Ejection Fraction）主要特徵是左心室舒張功能不良，這意味著心臟在舒張期無法有效填充，儘管射血分數（EF）正常。" },
+            { q: "2. HFpEF患者的左心室射血分數（LVEF）通常是：", o: ["A) <40%", "B) 40-49%", "C) ≥50%", "D) 不確定"], a: "C", exp: "HFpEF的定義之一是左心室射血分數（LVEF）通常在50%或以上，這表示心臟的收縮功能是保留的。" },
+            { q: "3. 在HFpEF患者的飲食管理中，得舒飲食（DASH diet）主要強調：", o: ["A) 高脂肪攝入", "B) 高鹽攝入", "C) 高纖維和低鈉攝取", "D) 高蛋白攝入"], a: "C", exp: "得舒飲食旨在降低血壓，強調攝入高纖維和低鈉食物，以改善心血管健康。" },
+            { q: "4. HFpEF患者的飲食管理中，得舒飲食建議增加以下哪一類食物的攝入？", o: ["A) 加工食品", "B) 新鮮水果和蔬菜", "C) 高糖飲料", "D) 紅肉"], a: "B", exp: "得舒飲食提倡增加新鮮水果和蔬菜的攝入，因為它們富含纖維和有益心臟健康的營養素。" },
+            { q: "5. HFpEF患者的主要護理目標之一是：", o: ["A) 增加心臟負荷", "B) 減少液體滯留和改善呼吸困難", "C) 增加體重", "D) 增加鈉攝入"], a: "B", exp: "主要護理目標是減少液體滯留，這有助於減輕心臟負擔並改善呼吸困難等症狀。" },
+            { q: "6. 在HFpEF的管理中，以下哪一項是正確的？", o: ["A) 僅依賴藥物治療", "B) 僅依賴生活方式改變", "C) 結合藥物治療和生活方式改變", "D) 僅依賴手術治療"], a: "C", exp: "HFpEF的管理通常需要結合藥物治療和生活方式改變，以達到最佳的治療效果。" },
+            { q: "7. SGLT2抑制劑（SGLT2i）在HFpEF患者中的作用主要是：", o: ["A) 增加心臟收縮力", "B) 減少心臟負荷和改善心臟功能", "C) 增加血糖水平", "D) 增加體重"], a: "B", exp: "SGLT2抑制劑有助於減少液體滯留，從而減少心臟負荷並改善心臟功能。" },
+            { q: "8. 在HFpEF的藥物治療中，SGLT2抑制劑的主要作用機制是：", o: ["A) 增加腎臟葡萄糖重吸收", "B) 減少腎臟葡萄糖重吸收", "C) 增加腎臟鈉重吸收", "D) 減少腎臟鈉重吸收"], a: "B", exp: "SGLT2抑制劑通過減少腎臟對葡萄糖的重吸收，從而降低血糖水平，並具有利尿作用。" },
+            { q: "9. HFpEF患者的復健計畫通常包括：", o: ["A) 高強度間歇訓練", "B) 中等強度的有氧運動", "C) 僅限於靜態運動", "D) 無需運動"], a: "B", exp: "中等強度的有氧運動有助於改善心臟功能和整體健康，適合HFpEF患者。" },
+            { q: "10. 在HFpEF患者的復健計畫中，哪一項是正確的？", o: ["A) 完全避免運動", "B) 僅進行力量訓練", "C) 結合有氧運動和力量訓練", "D) 僅進行靜態運動"], a: "C", exp: "結合有氧運動和力量訓練有助於改善心臟健康和整體體能，對HFpEF患者有益。" }
+        ];
+
+        function createQuizPages() {
+            allQuestions.forEach((q, index) => {
+                const pageIndex = 6 + index;
+                const quizPage = document.createElement('section');
+                quizPage.id = `page-${pageIndex}`;
+                quizPage.className = 'content-section quiz-page';
+
+                let optionsHtml = '';
+                q.o.forEach(optionText => {
+                    const value = optionText.charAt(0);
+                    optionsHtml += `<label><input type="radio" name="q${index}" value="${value}"> ${optionText}</label>`;
                 });
-            }
 
-            function handleQuizAnswer(qIndex) {
-                const qData = allQuestions[qIndex];
-                const optionsContainer = document.getElementById(`options-${qIndex}`);
-                const labels = optionsContainer.querySelectorAll('label');
-                const explanation = document.getElementById(`exp-${qIndex}`);
-                const nextBtn = document.querySelector(`#page-${6 + qIndex} .next-btn`);
+                quizPage.innerHTML = `
+                    <h2>綜合測驗 - 第 ${index + 1} 題</h2>
+                    <p class="question">${q.q}</p>
+                    <div class="options" id="options-${index}">${optionsHtml}</div>
+                    <div class="explanation" id="exp-${index}"><b>解說：</b>${q.exp}</div>
+                    <div class="page-nav">
+                        <button class="nav-btn prev-btn">上一題</button>
+                        <button class="nav-btn next-btn">${(index === allQuestions.length - 1) ? '查看結果並自動儲存' : '下一題'}</button>
+                    </div>
+                    <div class="page-footer">心臟血管內科 心臟功能強化中心製作</div>
+                `;
 
-                labels.forEach(label => {
-                    const radio = label.querySelector('input');
-                    radio.addEventListener('click', () => {
-                        if (optionsContainer.classList.contains('answered')) return;
-                        
-                        optionsContainer.classList.add('answered');
-                        userAnswers[qIndex] = radio.value; // 儲存使用者答案
-                        
-                        if (radio.value === qData.a) {
-                            label.classList.add('correct');
-                            score++;
-                        } else {
-                            label.classList.add('incorrect');
-                            labels.forEach(l => {
-                                if (l.querySelector('input').value === qData.a) {
-                                    l.classList.add('correct');
-                                }
-                            });
-                        }
-                        explanation.style.display = 'block';
-                        nextBtn.style.display = 'inline-block';
-                    });
-                });
-            }
+                mainContent.insertBefore(quizPage, document.getElementById('page-16'));
+            });
+        }
 
-            function showPage(index) {
-                document.querySelectorAll('.content-section').forEach(p => p.classList.remove('active'));
-                const targetPage = document.getElementById(`page-${index}`);
-                if (targetPage) {
-                    targetPage.classList.add('active');
-                    currentPageIndex = index;
-                    const totalPages = 5 + allQuestions.length + 1;
-                    const progress = (currentPageIndex / totalPages) * 100;
-                    progressBar.style.width = `${progress}%`;
-                }
-            }
+        function handleQuizAnswer(qIndex) {
+            const qData = allQuestions[qIndex];
+            const optionsContainer = document.getElementById(`options-${qIndex}`);
+            const labels = optionsContainer.querySelectorAll('label');
+            const explanation = document.getElementById(`exp-${qIndex}`);
+            const nextBtn = document.querySelector(`#page-${6 + qIndex} .next-btn`);
 
-            function setupNavButtons() {
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const parentPage = btn.closest('.content-section');
-                        const pageIdNum = parseInt(parentPage.id.split('-')[1]);
+            labels.forEach(label => {
+                const radio = label.querySelector('input');
 
-                        if (btn.classList.contains('start-btn')) {
-                            showPage(1);
-                        } else if (btn.classList.contains('next-btn')) {
-                            showPage(pageIdNum + 1);
-                        } else if (btn.classList.contains('prev-btn')) {
-                            showPage(pageIdNum - 1);
-                        } else if (btn.classList.contains('restart-btn')) {
-                            location.reload();
-                        } else if (btn.classList.contains('export-btn')) {
-                            openPrefilledGoogleForm();
-                        }
-                    });
-                });
-            }
+                radio.addEventListener('click', () => {
+                    if (optionsContainer.classList.contains('answered')) return;
 
-            function fetchCompletionCount() {
-                const countEl = document.getElementById('completion-number');
-                if (!countEl) return;
-                fetch(webAppUrl)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.count !== undefined) {
-                            countEl.textContent = data.count;
-                        }
-                    })
-                    .catch(err => console.error('取得完成課程人數失敗:', err));
-            }
+                    optionsContainer.classList.add('answered');
+                    userAnswers[qIndex] = radio.value;
 
-            function showFinalResults() {
-                const scoreCircle = document.getElementById('score-circle');
-                const scoreText = document.getElementById('score-text');
-                const resultMessageEl = document.getElementById('result-message');
-                const radius = scoreCircle.r.baseVal.value;
-                const circumference = 2 * Math.PI * radius;
-                const percentage = score / allQuestions.length;
-                const offset = circumference * (1 - percentage);
-
-                scoreCircle.style.strokeDasharray = circumference;
-                scoreCircle.style.strokeDashoffset = circumference;
-                setTimeout(() => {
-                    scoreCircle.style.strokeDashoffset = offset;
-                }, 100);
-
-                scoreText.textContent = `${score}/${allQuestions.length}`;
-                
-                let resultMessage = '';
-                if (percentage === 1) {
-                    resultMessage = '<h3>恭喜您！</h3><p>全部答對，您已完全掌握HFpEF的核心知識。</p>';
-                } else if (percentage >= 0.8) {
-                    resultMessage = '<h3>表現優異！</h3><p>您對HFpEF有非常好的理解。</p>';
-                } else if (percentage >= 0.6) {
-                    resultMessage = '<h3>不錯的成績！</h3><p>建議您可以回顧答錯的題目以加深印象。</p>';
-                } else {
-                    resultMessage = '<h3>再接再厲！</h3><p>建議您重新學習課程內容，鞏固知識基礎。</p>';
-                }
-                resultMessageEl.innerHTML = resultMessage;
-
-                // 自動在背景提交結果
-                submitToGoogleFormInBackground();
-            }
-
-            function submitToGoogleFormInBackground() {
-                const statusEl = document.getElementById('submission-status');
-                statusEl.textContent = '正在儲存您的作答紀錄...';
-
-                const payload = {
-                    answers: userAnswers,
-                    score: score
-                };
-
-                fetch(webAppUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        statusEl.textContent = '您的作答紀錄已成功儲存！';
-                        statusEl.style.color = 'var(--correct-color)';
+                    if (radio.value === qData.a) {
+                        label.classList.add('correct');
+                        score++;
                     } else {
-                        throw new Error(data.message);
+                        label.classList.add('incorrect');
+
+                        labels.forEach(l => {
+                            if (l.querySelector('input').value === qData.a) {
+                                l.classList.add('correct');
+                            }
+                        });
                     }
-                }).catch(error => {
-                    console.error('提交錯誤:', error);
-                    statusEl.textContent = '';
+
+                    explanation.style.display = 'block';
+                    nextBtn.style.display = 'inline-block';
                 });
+            });
+        }
+
+        function showPage(index) {
+            document.querySelectorAll('.content-section').forEach(p => p.classList.remove('active'));
+
+            const targetPage = document.getElementById(`page-${index}`);
+
+            if (targetPage) {
+                targetPage.classList.add('active');
+                currentPageIndex = index;
+
+                const totalPages = 5 + allQuestions.length + 1;
+                const progress = (currentPageIndex / totalPages) * 100;
+
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+
+        function setupNavButtons() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const parentPage = btn.closest('.content-section');
+                    const pageIdNum = parseInt(parentPage.id.split('-')[1]);
+
+                    if (btn.classList.contains('start-btn')) {
+                        showPage(1);
+                    } else if (btn.classList.contains('next-btn')) {
+                        showPage(pageIdNum + 1);
+                    } else if (btn.classList.contains('prev-btn')) {
+                        showPage(pageIdNum - 1);
+                    } else if (btn.classList.contains('restart-btn')) {
+                        location.reload();
+                    } else if (btn.classList.contains('export-btn')) {
+                        openPrefilledGoogleForm();
+                    }
+                });
+            });
+        }
+
+        function fetchCompletionCount() {
+            const countEl = document.getElementById('completion-number');
+            if (!countEl) return;
+
+            fetch(webAppUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.count !== undefined) {
+                        countEl.textContent = data.count;
+                    }
+                })
+                .catch(err => console.error('取得完成課程筆數失敗:', err));
+        }
+
+        function showFinalResults() {
+            const scoreCircle = document.getElementById('score-circle');
+            const scoreText = document.getElementById('score-text');
+            const resultMessageEl = document.getElementById('result-message');
+            const radius = scoreCircle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const percentage = score / allQuestions.length;
+            const offset = circumference * (1 - percentage);
+
+            scoreCircle.style.strokeDasharray = circumference;
+            scoreCircle.style.strokeDashoffset = circumference;
+
+            setTimeout(() => {
+                scoreCircle.style.strokeDashoffset = offset;
+            }, 100);
+
+            scoreText.textContent = `${score}/${allQuestions.length}`;
+
+            let resultMessage = '';
+
+            if (percentage === 1) {
+                resultMessage = '<h3>恭喜您！</h3><p>全部答對，您已完全掌握HFpEF的核心知識。</p>';
+            } else if (percentage >= 0.8) {
+                resultMessage = '<h3>表現優異！</h3><p>您對HFpEF有非常好的理解。</p>';
+            } else if (percentage >= 0.6) {
+                resultMessage = '<h3>不錯的成績！</h3><p>建議您可以回顧答錯的題目以加深印象。</p>';
+            } else {
+                resultMessage = '<h3>再接再厲！</h3><p>建議您重新學習課程內容，鞏固知識基礎。</p>';
             }
 
-            function openPrefilledGoogleForm() {
-                const googleFormViewUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc8QsDdvTsxQsj9ysG-qRi7GwyBSd19kdpVnABwwnQclnouJQ/viewform";
+            resultMessageEl.innerHTML = resultMessage;
 
-                const entryIds = [
-                    "entry.111604194", "entry.148114285", "entry.158789589", "entry.1292023933", 
-                    "entry.198279951", "entry.103983281", "entry.117196010", "entry.1593035392", 
-                    "entry.1691283594", "entry.2120032997"
-                ];
-                
-                const scoreEntryId = "entry.151787163"; 
+            submitCompletionRecord();
+        }
 
-                let prefilledUrl = `${googleFormViewUrl}?usp=pp_url`;
+        function submitCompletionRecord() {
+            if (hasSubmittedCompletion) return;
 
-                userAnswers.forEach((answer, index) => {
-                    if(answer) {
-                        prefilledUrl += `&${entryIds[index]}=${encodeURIComponent(answer)}`;
+            hasSubmittedCompletion = true;
+
+            const statusEl = document.getElementById('submission-status');
+            statusEl.textContent = '正在儲存您的完成紀錄...';
+
+            const payload = {
+                score: score,
+                answers: userAnswers,
+                page: document.title,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusEl.textContent = '您的完成紀錄已成功儲存！';
+                    statusEl.style.color = 'var(--correct-color)';
+
+                    if (data.count !== undefined) {
+                        document.getElementById('completion-number').textContent = data.count;
                     }
-                });
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('提交錯誤:', error);
+                statusEl.textContent = '完成紀錄儲存失敗，請稍後再試。';
+                statusEl.style.color = 'var(--incorrect-color)';
+                hasSubmittedCompletion = false;
+            });
+        }
 
-                prefilledUrl += `&${scoreEntryId}=${encodeURIComponent(score)}`;
+        function openPrefilledGoogleForm() {
+            const googleFormViewUrl = "https://docs.google.com/forms/d/e/1FAIpQLSc8QsDdvTsxQsj9ysG-qRi7GwyBSd19kdpVnABwwnQclnouJQ/viewform";
 
-                window.open(prefilledUrl, '_blank');
-            }
+            const entryIds = [
+                "entry.111604194",
+                "entry.148114285",
+                "entry.158789589",
+                "entry.1292023933",
+                "entry.198279951",
+                "entry.103983281",
+                "entry.117196010",
+                "entry.1593035392",
+                "entry.1691283594",
+                "entry.2120032997"
+            ];
 
-            // --- 初始化流程 ---
-            createQuizPages();
-            allQuestions.forEach((_, index) => handleQuizAnswer(index));
-            setupNavButtons();
-            document.querySelector('#page-15 .next-btn').addEventListener('click', showFinalResults);
-            fetchCompletionCount();
-            showPage(0);
-        });
-    </script>
+            const scoreEntryId = "entry.151787163";
+
+            let prefilledUrl = `${googleFormViewUrl}?usp=pp_url`;
+
+            userAnswers.forEach((answer, index) => {
+                if (answer) {
+                    prefilledUrl += `&${entryIds[index]}=${encodeURIComponent(answer)}`;
+                }
+            });
+
+            prefilledUrl += `&${scoreEntryId}=${encodeURIComponent(score)}`;
+
+            window.open(prefilledUrl, '_blank');
+        }
+
+        // 初始化流程
+        createQuizPages();
+        allQuestions.forEach((_, index) => handleQuizAnswer(index));
+        setupNavButtons();
+
+        const finalQuizNextButton = document.querySelector('#page-15 .next-btn');
+        if (finalQuizNextButton) {
+            finalQuizNextButton.addEventListener('click', showFinalResults);
+        }
+
+        fetchCompletionCount();
+        showPage(0);
+    });
+</script>
 </body>
 </html>
